@@ -35,7 +35,7 @@ class ReverseGpx
     public function createReversedXML($reversed, $original)
     {
         $out = <<<XML
-            <gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:gpsies="https://www.gpsies.com/GPX/1/0" creator="GPSies https://www.gpsies.com - Pienza - San Quirico d&amp;apos;Orcia" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd https://www.gpsies.com/GPX/1/0 https://www.gpsies.com/gpsies.xsd">
+            <gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
             </gpx>
         XML;
         $newXML = new SimpleXMLElement($out);
@@ -52,7 +52,13 @@ class ReverseGpx
         }
 
         $filename = explode('.', $this->path);
-        $newXML->asXML($filename[0] . '_reversed.' . $filename[1]);
+        $extesnsion = end($filename);
+        $name = prev($filename);
+        if (count(explode('/', $name)) > 1) {
+            $name = explode('/', $name);
+            $name = end($name);
+        }
+        $newXML->asXML($name . '_reversed.' . $extesnsion);
     }
 
     private function addMetadata(&$newXML, $original)
@@ -62,22 +68,23 @@ class ReverseGpx
         isset($original->metadata->author) ? $newXML->metadata->addChild('author', $original->metadata->author) : '';
         isset($original->metadata->author->name) ? $newXML->metadata->author->addChild('name', $original->metadata->author->name) : '';
         isset($original->metadata->time) ? $newXML->metadata->addChild('time', $original->metadata->time) : '';
-        if(isset($original->metadata->extensions)){
-            $this->addExtensions($newXML,$original);
+        if (isset($original->metadata->extensions)) {
+            $this->addExtensions($newXML, $original);
         }
     }
 
 
-    private function addExtensions(&$newXML,$original){
+    private function addExtensions(&$newXML, $original)
+    {
         $newXML->metadata->addChild('extensions');
         var_dump($original->metadata->extensions);
-    //   <gpsies:property>one-way trip</gpsies:property>
-    //   <gpsies:trackLengthMeter>9347.554717852248</gpsies:trackLengthMeter>
-    //   <gpsies:totalAscentMeter>271.0</gpsies:totalAscentMeter>
-    //   <gpsies:totalDescentMeter>330.0</gpsies:totalDescentMeter>
-    //   <gpsies:minHeightMeter>288.0</gpsies:minHeightMeter>
-    //   <gpsies:maxHeightMeter>474.0</gpsies:maxHeightMeter>
-    // </extensions>
+        //   <gpsies:property>one-way trip</gpsies:property>
+        //   <gpsies:trackLengthMeter>9347.554717852248</gpsies:trackLengthMeter>
+        //   <gpsies:totalAscentMeter>271.0</gpsies:totalAscentMeter>
+        //   <gpsies:totalDescentMeter>330.0</gpsies:totalDescentMeter>
+        //   <gpsies:minHeightMeter>288.0</gpsies:minHeightMeter>
+        //   <gpsies:maxHeightMeter>474.0</gpsies:maxHeightMeter>
+        // </extensions>
     }
 
     private function addWPT(&$newXML, $original)
